@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contador de Exercícios</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       background-color: #121212;
@@ -146,6 +147,21 @@
       border-radius: 5px;
       cursor: pointer;
     }
+	
+	 .exit-fullscreen {
+      display: none;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ff4c4c;
+      border: none;
+      color: #fff;
+      font-size: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 10000; /* Garantir que esteja acima do overlay */
+    }
   </style>
 </head>
 <body>
@@ -158,6 +174,9 @@
   
   <div class="fullscreen-overlay" id="fullscreenOverlay">
     <div id="fullscreenCounter">0</div>
+  <button class="exit-fullscreen" id="exitFullscreenButton">
+  <i class="fas fa-times"></i> 
+</button>
   </div>
 
   <script>
@@ -170,7 +189,9 @@
       contenedor.className = "contador-wrapper";
       
       contenedor.innerHTML = `
-	  <button class="fullscreen-button" onclick="ativarTelaCheia(this)"⇿</button>
+	  <button class="fullscreen-button" onclick="ativarTelaCheia(this)">
+  <i class="fas fa-expand"></i>
+</button>
         <button class="remove-contador" onclick="removerContador(this)">X</button>
         <div class="contador-titulo">${nome}</div>
         <div class="contador" data-contador>0</div>
@@ -278,10 +299,15 @@ function ativarTelaCheia(button) {
       fullscreenContadorElem = button.closest(".contador-wrapper").querySelector("[data-contador]");
       const fullscreenOverlay = document.getElementById("fullscreenOverlay");
       const fullscreenCounter = document.getElementById("fullscreenCounter");
+      const exitFullscreenButton = document.getElementById("exitFullscreenButton");
       
       fullscreenCounter.textContent = fullscreenContadorElem.textContent;
       fullscreenOverlay.style.display = "flex";
+      exitFullscreenButton.style.display = "block"; // Mostra o botão de sair;
     }
+	
+	
+	
 
     // Detecta arrastar para cima/baixo para incrementar/decrementar
     let startY;
@@ -296,30 +322,28 @@ function ativarTelaCheia(button) {
       const fullscreenCounter = document.getElementById("fullscreenCounter");
 
       // Swipe para cima
-      if (currentY < startY - 250) {
+      if (currentY < startY - 350) {
         fullscreenContadorElem.textContent = parseInt(fullscreenContadorElem.textContent) + increment;
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
       }
       // Swipe para baixo
-      else if (currentY > startY + 250) {
+      else if (currentY > startY + 350) {
         fullscreenContadorElem.textContent = Math.max(0, parseInt(fullscreenContadorElem.textContent) - increment);
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
       }
     });
 
-    // Pressionar e segurar para sair do modo tela cheia
-    document.getElementById("fullscreenOverlay").addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      setTimeout(() => {
-        if (isFullscreen) {
-          isFullscreen = false;
-          document.getElementById("fullscreenOverlay").style.display = "none";
-        }
-      }, 2000); // Segura por 2000ms para sair
+	// Evento para o botão de sair da tela cheia
+    document.getElementById("exitFullscreenButton").addEventListener("click", () => {
+      if (isFullscreen) {
+        isFullscreen = false;
+        document.getElementById("fullscreenOverlay").style.display = "none"; // Sai do modo tela cheia
+        document.getElementById("exitFullscreenButton").style.display = "none"; // Esconde o botão de sair
+      }
     });
-
+	
     <!-- Previne a atualização da página com confirmações-->
     window.addEventListener("beforeunload", function(event) {
       const primeiraConfirmacao = confirm("Deseja mesmo atualizar a página?");
