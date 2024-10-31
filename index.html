@@ -185,31 +185,56 @@
     let fullscreenContadorElem;
 	
     function criarContador(nome = 'Exercício') {
-      const contenedor = document.createElement("div");
-      contenedor.className = "contador-wrapper";
-      
-      contenedor.innerHTML = `
-	  <button class="fullscreen-button" onclick="ativarTelaCheia(this)">
-  <i class="fas fa-expand"></i>
-</button>
-        <button class="remove-contador" onclick="removerContador(this)">X</button>
-        <div class="contador-titulo">${nome}</div>
-        <div class="contador" data-contador>0</div>
-        <div class="input-container">
-          <input type="text" placeholder="Nome do exercício" onchange="atualizarNome(this)">
-          <label for="incremento">Repetições por Contagem:</label><br><br>
-          <input type="number" min="1" value="1" onchange="atualizarIncremento(this)">
-        </div>
-		<br>
-        <div class="buttons">
-          <button onclick="decrementar(this)">Diminuir</button>
-          <button onclick="incrementar(this)">Aumentar</button>
-        </div>
-        <button class="reset" onclick="resetar(this)">Resetar</button>
-      `;
-      
-      document.getElementById("contadores").appendChild(contenedor);
+  const contenedor = document.createElement("div");
+  contenedor.className = "contador-wrapper";
+  
+  contenedor.innerHTML = `
+    <button class="fullscreen-button" onclick="ativarTelaCheia(this)">
+      <i class="fas fa-expand"></i>
+    </button>
+    <button class="remove-contador" onclick="removerContador(this)">X</button>
+    <span class="contador-titulo" onclick="editarNome(this)">${nome}</span>
+    <div class="contador" data-contador>0</div>
+    <div class="input-container">
+      <label for="incremento">Repetições por Contagem:</label><br><br>
+      <input type="number" min="1" value="1" onchange="atualizarIncremento(this)">
+    </div>
+    <br>
+    <div class="buttons">
+      <button onclick="decrementar(this)">Diminuir</button>
+      <button onclick="incrementar(this)">Aumentar</button>
+    </div>
+    <button class="reset" onclick="resetar(this)">Resetar</button>
+  `;
+  
+  document.getElementById("contadores").appendChild(contenedor);
+}
+
+function editarNome(span) {
+  const nomeAtual = span.textContent;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = nomeAtual;
+  
+  input.addEventListener("blur", () => {
+    span.textContent = input.value || "Exercício"; // Define o nome para "Exercício" se não estiver vazio
+    span.style.display = "block"; // Reexibe o span
+    input.remove(); // Remove o campo de entrada
+  });
+  
+  input.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      span.textContent = input.value || "Exercício"; // Define o nome para "Exercício" se não estiver vazio
+      span.style.display = "block"; // Reexibe o span
+      input.remove(); // Remove o campo de entrada
     }
+  });
+  
+  span.style.display = "none"; // Esconde o span
+  span.parentNode.insertBefore(input, span); // Insere o input antes do span
+  input.focus(); // Foca no campo de entrada
+}
+
 
     function adicionarContador() {
       criarContador();
@@ -282,27 +307,7 @@
       }
     });
 
-    // Listener para os botões de volume e play/pause de fones de ouvido
-    navigator.mediaSession.setActionHandler("previoustrack", () => {
-      incrementarPrimeiroContador();
-    });
-    navigator.mediaSession.setActionHandler("nexttrack", () => {
-      decrementarPrimeiroContador();
-    });
-
-    function incrementarPrimeiroContador() {
-      const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
-      if (!primeiroContador) return;
-      const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
-      primeiroContador.textContent = parseInt(primeiroContador.textContent) + incremento;
-    }
-
-    function decrementarPrimeiroContador() {
-      const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
-      if (!primeiroContador) return;
-      const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
-      primeiroContador.textContent = Math.max(0, parseInt(primeiroContador.textContent) - incremento);
-    }
+    
 
 function ativarTelaCheia(button) {
       isFullscreen = true;
@@ -336,12 +341,20 @@ function ativarTelaCheia(button) {
         fullscreenContadorElem.textContent = parseInt(fullscreenContadorElem.textContent) + increment;
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
+		
+		if (navigator.vibrate) {
+    navigator.vibrate(100); // vibra por 100 milissegundos
+  }
       }
       // Swipe para baixo
       else if (currentY > startY + 350) {
         fullscreenContadorElem.textContent = Math.max(0, parseInt(fullscreenContadorElem.textContent) - increment);
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
+		
+		if (navigator.vibrate) {
+    navigator.vibrate(100); // vibra por 100 milissegundos
+  }
       }
     });
 
