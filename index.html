@@ -257,16 +257,18 @@ function editarNome(span) {
     }
 
     function incrementar(button) {
+
+      if (navigator.vibrate) {
+        navigator.vibrate(100); // vibra por 100 milissegundos
+        
   const contenedor = button.closest(".contador-wrapper");
   const incremento = parseInt(contenedor.dataset.incremento) || 1;
   const contadorElem = contenedor.querySelector("[data-contador]");
   let contador = parseInt(contadorElem.textContent) || 0;
   contador += incremento;
   contadorElem.textContent = contador;
-
   // Faz o celular vibrar
-  if (navigator.vibrate) {
-    navigator.vibrate(100); // vibra por 100 milissegundos
+ 
   }
 }
 
