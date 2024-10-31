@@ -194,15 +194,33 @@
       }
     }
 
-    // Evento de controle de volume para o primeiro contador
+    <!-- Controle de volume para o primeiro contador-->
     window.addEventListener("keydown", function(event) {
       const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
+      if (!primeiroContador) return;  // Verifica se o contador existe
+
       const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
       let contador = parseInt(primeiroContador.textContent) || 0;
-      if (event.key === "VolumeUp") {
+
+      if (event.key === "ArrowUp" || event.key === "Add" || event.key === "VolumeUp") {
         primeiroContador.textContent = contador + incremento;
-      } else if (event.key === "VolumeDown") {
+      } else if (event.key === "ArrowDown" || event.key === "Subtract" || event.key === "VolumeDown") {
         primeiroContador.textContent = Math.max(0, contador - incremento);
+      }
+    });
+
+    <!-- Previne a atualização da página com confirmações-->
+    window.addEventListener("beforeunload", function(event) {
+      const primeiraConfirmacao = confirm("Deseja mesmo atualizar a página?");
+      if (!primeiraConfirmacao) {
+        event.preventDefault();
+        return (event.returnValue = "");
+      }
+      
+      const segundaConfirmacao = confirm("Tem certeza?");
+      if (!segundaConfirmacao) {
+        event.preventDefault();
+        return (event.returnValue = "");
       }
     });
     
