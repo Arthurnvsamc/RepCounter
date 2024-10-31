@@ -114,6 +114,38 @@
       border-radius: 50%;
       cursor: pointer;
     }
+	
+	 /* Estilo para a tela cheia */
+    .fullscreen-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      color: #fff;
+      font-size: 5em;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      touch-action: none; /* Impede o comportamento padrão do navegador */
+    }
+    .contador-wrapper {
+      position: relative;
+    }
+    .fullscreen-button {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background-color: #444;
+      border: none;
+      color: #fff;
+      font-size: 0.8em;
+      padding: 5px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -122,13 +154,23 @@
     <!-- Contadores dinâmicos serão adicionados aqui -->
   </div>
   <button class="add-contador" onclick="adicionarContador()">+</button>
+  
+  
+  <div class="fullscreen-overlay" id="fullscreenOverlay">
+    <div id="fullscreenCounter">0</div>
+  </div>
 
   <script>
+  
+    let isFullscreen = false;
+    let fullscreenContadorElem;
+	
     function criarContador(nome = 'Exercício') {
       const contenedor = document.createElement("div");
       contenedor.className = "contador-wrapper";
       
       contenedor.innerHTML = `
+	  <button class="fullscreen-button" onclick="ativarTelaCheia(this)"⇿</button>
         <button class="remove-contador" onclick="removerContador(this)">X</button>
         <div class="contador-titulo">${nome}</div>
         <div class="contador" data-contador>0</div>
@@ -231,6 +273,52 @@
       primeiroContador.textContent = Math.max(0, parseInt(primeiroContador.textContent) - incremento);
     }
 
+function ativarTelaCheia(button) {
+      isFullscreen = true;
+      fullscreenContadorElem = button.closest(".contador-wrapper").querySelector("[data-contador]");
+      const fullscreenOverlay = document.getElementById("fullscreenOverlay");
+      const fullscreenCounter = document.getElementById("fullscreenCounter");
+      
+      fullscreenCounter.textContent = fullscreenContadorElem.textContent;
+      fullscreenOverlay.style.display = "flex";
+    }
+
+    // Detecta arrastar para cima/baixo para incrementar/decrementar
+    let startY;
+    document.getElementById("fullscreenOverlay").addEventListener("touchstart", (e) => {
+      startY = e.touches[0].clientY;
+    });
+
+    document.getElementById("fullscreenOverlay").addEventListener("touchmove", (e) => {
+      if (!isFullscreen) return;
+      const currentY = e.touches[0].clientY;
+      const increment = parseInt(fullscreenContadorElem.closest(".contador-wrapper").dataset.incremento) || 1;
+      const fullscreenCounter = document.getElementById("fullscreenCounter");
+
+      // Swipe para cima
+      if (currentY < startY - 250) {
+        fullscreenContadorElem.textContent = parseInt(fullscreenContadorElem.textContent) + increment;
+        fullscreenCounter.textContent = fullscreenContadorElem.textContent;
+        startY = currentY;
+      }
+      // Swipe para baixo
+      else if (currentY > startY + 250) {
+        fullscreenContadorElem.textContent = Math.max(0, parseInt(fullscreenContadorElem.textContent) - increment);
+        fullscreenCounter.textContent = fullscreenContadorElem.textContent;
+        startY = currentY;
+      }
+    });
+
+    // Pressionar e segurar para sair do modo tela cheia
+    document.getElementById("fullscreenOverlay").addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      setTimeout(() => {
+        if (isFullscreen) {
+          isFullscreen = false;
+          document.getElementById("fullscreenOverlay").style.display = "none";
+        }
+      }, 2000); // Segura por 2000ms para sair
+    });
 
     <!-- Previne a atualização da página com confirmações-->
     window.addEventListener("beforeunload", function(event) {
