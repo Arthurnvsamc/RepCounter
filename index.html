@@ -194,20 +194,43 @@
       }
     }
 
-    <!-- Controle de volume para o primeiro contador-->
+     // Controle de volume para o primeiro contador
     window.addEventListener("keydown", function(event) {
       const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
-      if (!primeiroContador) return;  // Verifica se o contador existe
+      if (!primeiroContador) return;
 
       const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
       let contador = parseInt(primeiroContador.textContent) || 0;
 
-      if (event.key === "ArrowUp" || event.key === "Add" || event.key === "VolumeUp") {
+      if (event.key === "ArrowUp" || event.key === "+" || event.key === "=") {
         primeiroContador.textContent = contador + incremento;
-      } else if (event.key === "ArrowDown" || event.key === "Subtract" || event.key === "VolumeDown") {
+      } else if (event.key === "ArrowDown" || event.key === "-" || event.key === "_") {
         primeiroContador.textContent = Math.max(0, contador - incremento);
       }
     });
+
+    // Listener para os botões de volume e play/pause de fones de ouvido
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      incrementarPrimeiroContador();
+    });
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      decrementarPrimeiroContador();
+    });
+
+    function incrementarPrimeiroContador() {
+      const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
+      if (!primeiroContador) return;
+      const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
+      primeiroContador.textContent = parseInt(primeiroContador.textContent) + incremento;
+    }
+
+    function decrementarPrimeiroContador() {
+      const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
+      if (!primeiroContador) return;
+      const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
+      primeiroContador.textContent = Math.max(0, parseInt(primeiroContador.textContent) - incremento);
+    }
+
 
     <!-- Previne a atualização da página com confirmações-->
     window.addEventListener("beforeunload", function(event) {
