@@ -337,7 +337,7 @@ function ativarTelaCheia(button) {
       const fullscreenCounter = document.getElementById("fullscreenCounter");
 
       // Swipe para cima
-      if (currentY < startY - 350) {
+      if (currentY < startY - 250) {
         fullscreenContadorElem.textContent = parseInt(fullscreenContadorElem.textContent) + increment;
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
@@ -347,7 +347,7 @@ function ativarTelaCheia(button) {
   }
       }
       // Swipe para baixo
-      else if (currentY > startY + 350) {
+      else if (currentY > startY + 300) {
         fullscreenContadorElem.textContent = Math.max(0, parseInt(fullscreenContadorElem.textContent) - increment);
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
