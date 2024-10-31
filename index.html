@@ -258,9 +258,8 @@ function editarNome(span) {
 
     function incrementar(button) {
 
-      if (navigator.vibrate) {
-        navigator.vibrate(100); // vibra por 100 milissegundos
-        
+    
+
   const contenedor = button.closest(".contador-wrapper");
   const incremento = parseInt(contenedor.dataset.incremento) || 1;
   const contadorElem = contenedor.querySelector("[data-contador]");
@@ -268,8 +267,8 @@ function editarNome(span) {
   contador += incremento;
   contadorElem.textContent = contador;
   // Faz o celular vibrar
- 
-  }
+  vibrar()
+  
 }
 
     function decrementar(button) {
@@ -281,9 +280,13 @@ function editarNome(span) {
   contadorElem.textContent = contador;
 
   // Faz o celular vibrar
-  if (navigator.vibrate) {
-    navigator.vibrate(100); // vibra por 100 milissegundos
-  }
+  vibrar()
+}
+
+function vibrar() {
+    if ("vibrate" in navigator) {
+        navigator.vibrate(100); // vibra por 200 milissegundos
+    }
 }
 
     function resetar(button) {
@@ -344,9 +347,7 @@ function ativarTelaCheia(button) {
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
 		
-		if (navigator.vibrate) {
-    navigator.vibrate(100); // vibra por 100 milissegundos
-  }
+        vibrar()
       }
       // Swipe para baixo
       else if (currentY > startY + 300) {
@@ -354,9 +355,7 @@ function ativarTelaCheia(button) {
         fullscreenCounter.textContent = fullscreenContadorElem.textContent;
         startY = currentY;
 		
-		if (navigator.vibrate) {
-    navigator.vibrate(100); // vibra por 100 milissegundos
-  }
+		vibrar()
       }
     });
 
