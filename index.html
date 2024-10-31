@@ -6,7 +6,114 @@
   <title>Contador de Exercícios</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    /* Seus estilos aqui */
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      max-width: 300px;
+      margin-top: 2em;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 0.5em;
+    }
+    .contador-wrapper {
+      background-color: #1d1d1d;
+      padding: 1em;
+      border-radius: 8px;
+      margin-bottom: 1.5em;
+      position: relative;
+    }
+    .contador-titulo {
+      font-size: 1.3em;
+      margin-bottom: 0.5em;
+    }
+    .contador {
+      font-size: 2.5em;
+      margin: 1em 0;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1em;
+      margin-bottom: 1em;
+    }
+    button {
+      background-color: #333333;
+      border: none;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:focus {
+      outline: none;
+    }
+    button:active {
+      background-color: #555555;
+    }
+    .reset {
+      color: #ff4c4c;
+      margin-top: 0.5em;
+    }
+    .reset:hover {
+      color: #ff6767;
+    }
+    .input-container {
+      margin-top: 1em;
+    }
+    input[type="number"], input[type="text"] {
+      width: 80px;
+      padding: 5px;
+      font-size: 1em;
+      text-align: center;
+      border-radius: 5px;
+      border: none;
+      color: #ffffff;
+      background-color: #333333;
+    }
+    .input-container input[type="text"] {
+      width: 100%;
+      margin-bottom: 1em;
+    }
+    .add-contador {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #4caf50;
+      border: none;
+      color: #ffffff;
+      font-size: 1.5em;
+      cursor: pointer;
+      padding: 10px 15px;
+      border-radius: 50%;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .add-contador:active {
+      background-color: #66bb6a;
+    }
+    .remove-contador {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: #ff4c4c;
+      border: none;
+      color: #ffffff;
+      font-size: 1em;
+      padding: 5px 8px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -17,76 +124,90 @@
   <button class="add-contador" onclick="adicionarContador()">+</button>
 
   <script>
-    // Funções de controle de contadores
-    let contadores = JSON.parse(localStorage.getItem("contadores")) || [];
-
-    function atualizarLocalStorage() {
-      localStorage.setItem("contadores", JSON.stringify(contadores));
-    }
-
-    function renderizarContadores() {
-      const contadoresContainer = document.getElementById("contadores");
-      contadoresContainer.innerHTML = '';
-      contadores.forEach((contador, index) => {
-        const contadorElement = document.createElement("div");
-        contadorElement.classList.add("contador-wrapper");
-        contadorElement.dataset.incremento = contador.incremento;
-        contadorElement.innerHTML = `
-          <div>
-            <span>${contador.nome}</span>
-            <span data-contador>${contador.valor}</span>
-          </div>
-          <button onclick="confirmarRemocao(${index})">X</button>
-        `;
-        contadoresContainer.appendChild(contadorElement);
-      });
+    function criarContador(nome = 'Exercício') {
+      const contenedor = document.createElement("div");
+      contenedor.className = "contador-wrapper";
+      
+      contenedor.innerHTML = `
+        <button class="remove-contador" onclick="removerContador(this)">X</button>
+        <div class="contador-titulo">${nome}</div>
+        <div class="contador" data-contador>0</div>
+        <div class="input-container">
+          <input type="text" placeholder="Nome do exercício" onchange="atualizarNome(this)">
+          <label for="incremento">Repetições por Contagem:</label><br><br>
+          <input type="number" min="1" value="1" onchange="atualizarIncremento(this)">
+        </div>
+		<br>
+        <div class="buttons">
+          <button onclick="decrementar(this)">Diminuir</button>
+          <button onclick="incrementar(this)">Aumentar</button>
+        </div>
+        <button class="reset" onclick="resetar(this)">Resetar</button>
+      `;
+      
+      document.getElementById("contadores").appendChild(contenedor);
     }
 
     function adicionarContador() {
-      const nome = prompt("Digite o nome do contador:");
-      const incremento = parseInt(prompt("Quantas repetições por contagem? (ex: 1, 10, 20)"), 10) || 1;
-      contadores.push({ nome, incremento, valor: 0 });
-      atualizarLocalStorage();
-      renderizarContadores();
+      criarContador();
     }
 
-    function confirmarRemocao(index) {
-      if (confirm("Deseja realmente remover este contador?")) {
-        contadores.splice(index, 1);
-        atualizarLocalStorage();
-        renderizarContadores();
+    function removerContador(button) {
+      if (confirm("Tem certeza de que deseja remover este contador?")) {
+        button.closest(".contador-wrapper").remove();
       }
     }
 
-    // Controle de Volume para o Primeiro Contador
+    function atualizarNome(input) {
+      const contenedor = input.closest(".contador-wrapper");
+      const titulo = contenedor.querySelector(".contador-titulo");
+      titulo.textContent = input.value || "Exercício";
+    }
+
+    function atualizarIncremento(input) {
+      input.closest(".contador-wrapper").dataset.incremento = input.value || 1;
+    }
+
+    function incrementar(button) {
+      const contenedor = button.closest(".contador-wrapper");
+      const incremento = parseInt(contenedor.dataset.incremento) || 1;
+      const contadorElem = contenedor.querySelector("[data-contador]");
+      let contador = parseInt(contadorElem.textContent) || 0;
+      contador += incremento;
+      contadorElem.textContent = contador;
+    }
+
+    function decrementar(button) {
+      const contenedor = button.closest(".contador-wrapper");
+      const incremento = parseInt(contenedor.dataset.incremento) || 1;
+      const contadorElem = contenedor.querySelector("[data-contador]");
+      let contador = parseInt(contadorElem.textContent) || 0;
+      contador = Math.max(0, contador - incremento);
+      contadorElem.textContent = contador;
+    }
+
+    function resetar(button) {
+      const contenedor = button.closest(".contador-wrapper");
+      const contadorElem = contenedor.querySelector("[data-contador]");
+      if (confirm("Tem certeza de que deseja resetar o contador?")) {
+        contadorElem.textContent = 0;
+      }
+    }
+
+    // Evento de controle de volume para o primeiro contador
     window.addEventListener("keydown", function(event) {
-      if (contadores.length > 0) {
-        const incremento = contadores[0].incremento;
-        if (event.key === "ArrowUp" || event.key === "VolumeUp") {
-          contadores[0].valor += incremento;
-        } else if (event.key === "ArrowDown" || event.key === "VolumeDown") {
-          contadores[0].valor = Math.max(0, contadores[0].valor - incremento);
-        }
-        atualizarLocalStorage();
-        renderizarContadores();
+      const primeiroContador = document.querySelector(".contador-wrapper [data-contador]");
+      const incremento = parseInt(primeiroContador.closest(".contador-wrapper").dataset.incremento) || 1;
+      let contador = parseInt(primeiroContador.textContent) || 0;
+      if (event.key === "VolumeUp") {
+        primeiroContador.textContent = contador + incremento;
+      } else if (event.key === "VolumeDown") {
+        primeiroContador.textContent = Math.max(0, contador - incremento);
       }
     });
-
-    // Inicializar contadores ao carregar
-    renderizarContadores();
-
-    // Registro do Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => {
-            console.log('Service Worker registrado com sucesso:', registration);
-          })
-          .catch(error => {
-            console.log('Falha no registro do Service Worker:', error);
-          });
-      });
-    }
+    
+    // Cria um contador inicial padrão
+    criarContador();
   </script>
 </body>
 </html>
